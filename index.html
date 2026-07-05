@@ -16,7 +16,6 @@
       box-sizing: border-box;
     }
 
-    /* Light Theme (Default) */
     :root {
       --bg-body: linear-gradient(145deg, #eef2f7 0%, #dce4ec 100%);
       --container-bg: #ffffff;
@@ -33,7 +32,6 @@
       --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
     }
 
-    /* Dark Theme */
     body.dark {
       --bg-body: linear-gradient(145deg, #1a1e2c 0%, #0f1219 100%);
       --container-bg: #1e2432;
@@ -68,7 +66,6 @@
       transition: background 0.3s;
     }
 
-    /* Theme Toggle */
     .theme-toggle {
       position: fixed;
       bottom: 25px;
@@ -119,7 +116,6 @@
       margin-top: 6px; 
     }
 
-    /* Input Grid */
     .input-grid {
       display: flex;
       flex-wrap: wrap;
@@ -163,7 +159,6 @@
     .btn-primary:hover { background: #0e6583; transform: translateY(-1px); }
     .btn-secondary { background: #eef3f7; color: #2a5f74; border: 1px solid #cde0e8; }
 
-    /* EIBOR Panel - Live */
     .eibor-panel {
       background: var(--panel-bg);
       padding: 0.8rem 2rem;
@@ -193,7 +188,6 @@
     }
     .total-rate-badge { background: #1e5f78; color: white; border-radius: 40px; padding: 5px 14px; font-weight: 700; }
 
-    /* Step & Prepay Panels */
     .step-rate-panel, .prepay-master {
       background: var(--panel-bg);
       margin: 1rem 1.8rem;
@@ -252,7 +246,6 @@
     }
     .savings-badge { background: #e0f2e9; border-radius: 40px; padding: 5px 14px; font-size: 0.7rem; font-weight: 700; color: #1e6f5c; }
 
-    /* Summary Stats */
     .summary-strip {
       display: flex;
       flex-wrap: wrap;
@@ -273,13 +266,11 @@
     .stat-label { font-size: 0.65rem; font-weight: 700; color: var(--label-color); text-transform: uppercase; letter-spacing: 0.5px; }
     .stat-number { font-size: 1.3rem; font-weight: 800; color: var(--text-primary); margin-top: 4px; }
 
-    /* Charts */
     .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin: 1.5rem 0; }
     .chart-card { background: var(--card-bg); border-radius: 28px; padding: 1rem; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
     .chart-card h4 { font-size: 0.85rem; margin-bottom: 12px; color: var(--text-secondary); font-weight: 700; }
     canvas { max-height: 250px; width: 100%; }
 
-    /* Table */
     .table-wrapper { overflow-x: auto; border-radius: 24px; border: 1px solid var(--border-color); background: var(--card-bg); }
     .amort-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 650px; }
     .amort-table th, .amort-table td { padding: 12px; text-align: right; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
@@ -297,7 +288,6 @@
 </head>
 <body>
 
-<!-- THEME TOGGLE -->
 <button class="theme-toggle" id="themeToggleBtn">🌓 Dark / Light</button>
 
 <div class="mortgage-container">
@@ -317,7 +307,6 @@
     <div><button class="btn btn-primary" id="refreshBtn">⟳ Update</button></div>
   </div>
 
-  <!-- LIVE EIBOR PANEL -->
   <div class="eibor-panel" id="eiborPanel">
     <div class="live-indicator">
       <span class="pulse-dot"></span>
@@ -327,14 +316,12 @@
     <div id="eiborTimestamp" style="font-size:0.65rem; color:#5e7e92;">live market</div>
   </div>
 
-  <!-- STEP RATES -->
   <div class="step-rate-panel">
     <strong>📈 Step Up / Down Rates (custom periods)</strong>
     <div id="stepRatesList"></div>
     <button id="addStepBtn" class="add-prepay-btn">+ Add Rate Period</button>
   </div>
 
-  <!-- PREPAYMENTS -->
   <div class="prepay-master">
     <div style="display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center; margin-bottom:0.5rem;">
       <strong>💰 Prepayments (reduce principal early)</strong>
@@ -344,7 +331,6 @@
     <button id="addPrepayBtn" class="add-prepay-btn">+ Add Prepayment</button>
   </div>
 
-  <!-- SUMMARY -->
   <div class="summary-strip">
     <div class="stat-card"><div class="stat-label">LOAN AMOUNT</div><div class="stat-number" id="loanAmountStat">—</div></div>
     <div class="stat-card"><div class="stat-label">MONTHLY PAYMENT</div><div class="stat-number" id="monthlyStat">—</div></div>
@@ -374,7 +360,6 @@
 </div>
 
 <script>
-  // Theme Toggle
   const themeBtn = document.getElementById('themeToggleBtn');
   themeBtn.onclick = () => {
     document.body.classList.toggle('dark');
@@ -382,7 +367,7 @@
   };
   if(localStorage.getItem('mortgageTheme') === 'dark') document.body.classList.add('dark');
 
-  // ---------- LIVE EIBOR SIMULATION ----------
+  // Live EIBOR Simulation
   let currentEibor = 4.85;
   let eiborInterval = null;
   
@@ -400,10 +385,9 @@
     newVal = Math.min(7.5, Math.max(2.0, newVal));
     currentEibor = newVal;
     updateEiborDisplay();
-    fullRender(); // re-render with new rate
+    fullRender();
   }
   
-  // Start EIBOR updates (every 30 seconds)
   function startEiborUpdates() {
     currentEibor = 4.85;
     updateEiborDisplay();
@@ -411,7 +395,7 @@
     eiborInterval = setInterval(simulateEiborTick, 30000);
   }
 
-  // ---------- MORTGAGE ENGINE ----------
+  // Mortgage Engine
   let currentBalanceChart, currentPieChart, currentAnnualChart, currentMonthlyStack;
   let prepaymentsArray = [{ month: 12, amount: 50000 }, { month: 24, amount: 30000 }];
   let stepRatesArray = [{ startMonth: 1, endMonth: 60, rate: 4.25 }, { startMonth: 61, endMonth: 300, rate: 5.0 }];
@@ -455,7 +439,6 @@
       : principal * firstRate * Math.pow(1 + firstRate, totalMonths) / (Math.pow(1 + firstRate, totalMonths) - 1);
     if(isNaN(monthlyPayment)) monthlyPayment = principal / totalMonths;
     
-    // Original interest (no prepayment)
     let origInterest = 0, bal = principal;
     for(let m = 1; m <= totalMonths && bal > 0.01; m++) {
       let r = getMonthlyRate(m);
@@ -467,14 +450,12 @@
       bal -= prin;
     }
     
-    // Schedule with prepayments
     const sorted = [...prepays].filter(p => p.amount > 0 && p.month >= 1).sort((a,b) => a.month - b.month);
     let balance = principal, schedule = [], totalInt = 0, idx = 0;
     
     for(let month = 1; month <= totalMonths + 240; month++) {
       if(balance <= 0.001) break;
       
-      // Apply prepayments at this month
       while(idx < sorted.length && sorted[idx].month === month) {
         let extra = Math.min(sorted[idx].amount, balance);
         if(extra > 0) balance -= extra;
@@ -648,7 +629,6 @@
     renderAllCharts(schedule, totalInterest, totalPrincipal);
   }
 
-  // UI Helpers
   function renderPrepaysUI() {
     const c = document.getElementById('prepaymentsList');
     c.innerHTML = '';
@@ -719,7 +699,6 @@
     });
   }
 
-  // Event Bindings
   document.getElementById('refreshBtn').onclick = () => fullRender();
   document.getElementById('addPrepayBtn').onclick = () => {
     prepaymentsArray.push({ month: 36, amount: 40000 });
@@ -732,7 +711,6 @@
     fullRender();
   };
 
-  // Export functions
   document.getElementById('exportPDFBtn').onclick = () => {
     const element = document.querySelector('.table-wrapper');
     html2pdf().from(element).set({ margin: 0.5, filename: 'mortgage_schedule.pdf' }).save();
@@ -753,13 +731,11 @@
     a.click();
   };
 
-  // Input listeners for auto-update
   ['propertyVal', 'downPayment', 'loanYears', 'marginRate', 'fixedRate'].forEach(id => {
     document.getElementById(id).addEventListener('input', fullRender);
   });
   elements.rateTypeSelect.addEventListener('change', fullRender);
 
-  // Initialize
   renderStepRatesUI();
   renderPrepaysUI();
   startEiborUpdates();
